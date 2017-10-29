@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 if [ ! $JQ_EXECUTABLE ]; then 
-	JQ_EXECUTABLE="jq"
+    JQ_EXECUTABLE="jq"
 fi
 
 while [[ $# > 1 ]]
@@ -37,6 +37,10 @@ case $key in
     RU_PASSWORD="$2"
     shift # past argument
     ;;
+    -a|--api_key)
+    RU_API_KEY="$2"
+    shift # past argument
+    ;;
     *)
             # unknown option
     ;;
@@ -56,7 +60,9 @@ if [ $RU_HELP ] ; then
     echo ""
     echo "-f --file               Relative path of the artifact that you want to deploy to the Relution Enterprise App Store, relative to the workspace directory. This is typically an Apple iOS (.ipa) or Google Android (.apk) binary."
     echo "-h --host               The Relution base url to which the file should be deployed."
-    echo "-r --release_status     The Release status in which the file should be put."    
+    echo "-r --release_status     The release status in which the file should be put."  
+    echo "-e --environment        The development hub environment id."
+    echo "-a --api_key          Relution API Token used for the authentication."    
 fi
 
 if [ $RU_RELEASE_STATUS ]; then 
@@ -74,12 +80,13 @@ if [ ! $RU_FILE ]; then
     exit 1
 fi
 
-if [[ ! -f $RU_FILE ]]; then
-    echo "no files found for $RU_FILE"
-    exit 1
+if [[ ! -f $RU_API_KEY ]]; then
+    curl_auth="-H X-User-Access-Token:${RU_API_KEY}"
+else
+    curl_auth="-u ${RU_USER}:${RU_PASSWORD}"
 fi
 echo "Uploading '$RU_FILE' to '$RU_HOST/relution/api/v1/apps$curl_args' ..."
-response=$(curl -u $RU_USER:$RU_PASSWORD -F "app=@$RU_FILE" $RU_HOST/relution/api/v1/apps$curl_args)
+response=$(curl $curl_auth -F app=@$PWD/$RU_FILE $RU_HOST/relution/api/v1/apps$curl_args)
 echo $response | $JQ_EXECUTABLE '.message'
 response_code=$(echo $response | $JQ_EXECUTABLE -r '.status')
 if [[ $response_code == "0" ]]; then
