@@ -80,11 +80,12 @@ if [ ! $RU_FILE ]; then
     exit 1
 fi
 
-if [[ ! -f $RU_API_KEY ]]; then
+if [ $RU_API_KEY ]; then
     curl_auth="-H X-User-Access-Token:${RU_API_KEY}"
 else
     curl_auth="-u ${RU_USER}:${RU_PASSWORD}"
 fi
+
 echo "Uploading '$RU_FILE' to '$RU_HOST/relution/api/v1/apps$curl_args' ..."
 response=$(curl $curl_auth -F app=@$PWD/$RU_FILE $RU_HOST/relution/api/v1/apps$curl_args)
 echo $response | $JQ_EXECUTABLE '.message'
