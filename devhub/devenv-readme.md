@@ -16,10 +16,10 @@ The following build script can be used to build unsigned apps. Some Xcode projec
   ...
   script:
     - xcodebuild -scheme '${SCHEME_NAME}' -workspace '${PROJECT_NAME}.xcodeproj/project.xcworkspace' -configuration Release clean archive -archivePath build/${PROJECT_NAME}.xcarchive CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO 
-    - mkdir Payload && mv build/${PROJECT_NAME}.xcarchive/Products/Applications/${SCHEME_NAME}.app/ Payload/ && zip -r ${APP_NAME}.ipa Payload/ && rm -rf Payload/
+    - mkdir Payload && mv build/${PROJECT_NAME}.xcarchive/Products/Applications/${SCHEME_NAME}.app/ Payload/ && zip -r build/${APP_NAME}.ipa Payload/ && rm -rf Payload/
   artifacts:
     paths:
-    - ${APP_NAME}.ipa
+    - build/*.ipa
   ...
 ```
 
@@ -30,7 +30,7 @@ The following build step uploads apps back to relution via the `relution_upload_
 relution:
   stage: publish
   script:
-    - bash relution/relution_upload_app.sh -f ${APP_NAME}.ipa 
+    - bash relution/relution_upload_app.sh -f build/${APP_NAME}.ipa 
   allow_failure: true
   only:
     - master # when this should be run
