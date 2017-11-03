@@ -87,7 +87,7 @@ else
 fi
 
 echo "Uploading '$RU_FILE' to '$RU_HOST/relution/api/v1/apps$curl_args' ..."
-response=$(curl "$curl_auth" -F "app=@$PWD/$RU_FILE" "$RU_HOST/relution/api/v1/apps$curl_args")
+response=$(curl $curl_auth -F "app=@$PWD/$RU_FILE" "$RU_HOST/relution/api/v1/apps$curl_args")
 echo "$response" | "$JQ_EXECUTABLE" '.message'
 response_code=$(echo "$response" | "$JQ_EXECUTABLE" -r '.status')
 if [[ "$response_code" == "0" ]]; then
