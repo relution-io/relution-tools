@@ -12,10 +12,10 @@ fi
 BUNDLEID=$($PLISTBUDDY -c "Print :CFBundleIdentifier" "$INFO_PLIST")
 VERSION=$($PLISTBUDDY -c "Print :CFBundleVersion" "$INFO_PLIST" )
 
-echo "Set CFBundleVersion to $VERSION.$BUILD_NUMBER"
+echo "Set CFBundleVersion to $VERSION.$CI_PIPELINE_ID"
 
 $PLISTBUDDY -c "Delete :CFBundleVersion" "$INFO_PLIST"
-$PLISTBUDDY -c "Add :CFBundleVersion string '$VERSION.$BUILD_NUMBER'" "$INFO_PLIST"
+$PLISTBUDDY -c "Add :CFBundleVersion string '$VERSION.$CI_PIPELINE_ID'" "$INFO_PLIST"
 
 BUNDLEID_SCHEME="rla"$(echo "${BUNDLEID}"          | cksum -o3 | awk '{print $1}')
  VERSION_SCHEME="rlv"$(echo "${BUNDLEID}_$VERSION" | cksum -o3 | awk '{print $1}')
