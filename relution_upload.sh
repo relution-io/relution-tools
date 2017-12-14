@@ -41,8 +41,8 @@ case $key in
     RU_API_KEY="$2"
     shift # past argument
     ;;
-    --no_archive)
-    RU_ARCHIVE_VERSION=false
+    -n|--archive)
+    RU_ARCHIVE_VERSION="$2"
     shift # past argument
     ;;
     *)
@@ -67,7 +67,7 @@ if [ $RU_HELP ] ; then
     echo "-r --release_status     The Release status in which the file should be put."
     echo "-e --environment        The development hub environment id."
     echo "-a --api_key            Relution API Token used for the authentication."
-    echo "-n --no_archive         Do not archive the previous App Version"
+    echo "-n --archive            Wether to archive the previous App Version"
 fi
 
 if [[ -n "$RU_RELEASE_STATUS" ]]; then
@@ -81,7 +81,7 @@ if [[ -n "$RU_ENVIRONMENT_UUID" ]]; then
 fi
 
 if [[ -n "$RU_ARCHIVE_VERSION" ]]; then
-    curl_args="${curl_args}&archiveFormerVersion=false"
+    curl_args="${curl_args}&archiveFormerVersion=$RU_ARCHIVE_VERSION"
 fi
 
 if [[ -z "$RU_FILE" ]]; then
