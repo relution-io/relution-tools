@@ -66,7 +66,7 @@ if [ $RU_HELP ] ; then
     echo "-h --host               The Relution base url to which the file should be deployed."
     echo "-r --release_status     The Release status in which the file should be put."
     echo "-e --environment        The development hub environment id."
-    echo "-a --api_key          Relution API Token used for the authentication."
+    echo "-a --api_key            Relution API Token used for the authentication."
     echo "-n --no_archive         Do not archive the previous App Version"
 fi
 
@@ -95,8 +95,19 @@ else
     curl_auth="-u ${RU_USER}:${RU_PASSWORD}"
 fi
 
+# add optional changelog
+changelog=""
+if [[ -f changelog.md ]]; then
+    changelog="-c changelog.md"
+fi
+
+
 echo "Uploading '$RU_FILE' to '$RU_HOST/relution/api/v1/apps$curl_args' ..."
-response=$(curl $curl_auth -F "app=@$PWD/$RU_FILE" "$RU_HOST/relution/api/v1/apps$curl_args")
+response=$(curl \
+  $curl_auth \
+  $changelog \
+  -F "app=@$PWD/$RU_FILE" \
+  "$RU_HOST/relution/api/v1/apps$curl_args")
 echo "$response" | "$JQ_EXECUTABLE" '.message'
 response_code=$(echo "$response" | "$JQ_EXECUTABLE" -r '.status')
 if [[ "$response_code" == "0" ]]; then
