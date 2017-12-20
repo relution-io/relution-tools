@@ -98,7 +98,7 @@ fi
 # add optional changelog
 changelog=""
 if [[ -f changelog.md ]]; then
-    changelog="-c changelog.md"
+    changelog="-F changelog=@changelog.md"
 fi
 
 
