@@ -47,13 +47,14 @@ for file in "$@"; do
 
     filename=${CFBundleIdentifier_now}_v${CFBundleVersion_now}_${timestamp}.ipa
   else
-    # fix path for gitlab runner
-    echo hostname
-    if [[ $(hostname) = runner-* ]]; then
-      s=$($ANDROID_HOME/build-tools/*/aapt dump badging ${file} | grep package:\ name)
-    else
-      s=$(/usr/local/bin/aapt dump badging ${file} | grep package:\ name)
+    aaptPath=$(find $ANDROID_HOME/build-tools -name aapt -type f -print -quit)
+
+    if [[ ! -f $aaptPath ]]; then
+      echo "Error: Android Build Tools not installed."
+      exit 1
     fi
+
+    s=$($aaptPath dump badging ${file} | grep package:\ name)
 
     # extract the information from the file name to use them for the new file name
     declare -a infos=( ${s//\'/ } )
