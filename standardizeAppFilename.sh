@@ -47,7 +47,7 @@ for file in "$@"; do
 
     filename=${CFBundleIdentifier_now}_v${CFBundleVersion_now}_${timestamp}.ipa
   else
-    aaptPath=$(find $ANDROID_HOME/build-tools -name aapt -type f | tail -n 1)
+    aaptPath=$(find $ANDROID_HOME/build-tools -name aapt -type f -print -quit)
 
     if [[ ! -f $aaptPath ]]; then
       echo "Error: Android Build Tools not installed."
