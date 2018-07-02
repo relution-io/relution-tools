@@ -104,6 +104,7 @@ fi
 
 echo "Uploading '$RU_FILE' to '$RU_HOST/relution/api/v1/apps$curl_args' ..."
 response=$(curl \
+  -H "Accept:application/json" \
   $curl_auth \
   $changelog \
   -F "app=@$PWD/$RU_FILE" \
