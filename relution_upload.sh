@@ -1,5 +1,14 @@
 #!/bin/bash -e
 
+function finish {
+    echo ""
+    echo "There was an error uploading the App. This is the response we got" \
+    "from $RU_HOST"
+    echo $response
+}
+trap finish EXIT
+
+
 if [[ -z "$JQ_EXECUTABLE" ]]; then
 	JQ_EXECUTABLE="jq"
 fi
