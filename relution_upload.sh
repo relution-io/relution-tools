@@ -6,7 +6,7 @@ function finish {
     "from $RU_HOST"
     echo $response
 }
-trap finish EXIT
+trap finish ERR
 
 
 if [[ -z "$JQ_EXECUTABLE" ]]; then
