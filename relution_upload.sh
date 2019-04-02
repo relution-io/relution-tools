@@ -1,14 +1,5 @@
 #!/bin/bash -e
 
-function finish {
-    echo ""
-    echo "There was an error uploading the App. This is the response we got" \
-    "from $RU_HOST"
-    echo $response
-}
-trap finish ERR
-
-
 if [[ -z "$JQ_EXECUTABLE" ]]; then
 	JQ_EXECUTABLE="jq"
 fi
@@ -71,7 +62,7 @@ if [ $RU_HELP ] ; then
     echo " | | \ \  __/ | |_| | |_| | (_) | | | |"
     echo " |_|  \_\___|_|\__,_|\__|_|\___/|_| |_|"
     echo ""
-    echo "-f --file               Relative path of the artifact that you want to deploy to the Relution Enterprise App Store, relative to the workspace directory. This is typically an Apple iOS (.ipa) or Google Android (.apk) binary."
+    echo "-f --file               Path of the artifact that you want to deploy to the Relution Enterprise App Store, relative to the workspace directory. This is typically an Apple iOS (.ipa) or Google Android (.apk) binary."
     echo "-h --host               The Relution base url to which the file should be deployed."
     echo "-r --release_status     The Release status in which the file should be put."
     echo "-e --environment        The development hub environment id."
@@ -110,20 +101,39 @@ if [[ -f changelog.md ]]; then
     changelog="-F changelog=@changelog.md"
 fi
 
+# check if path given was relative or absolute
+if [[ "$RU_FILE" = /* ]]
+then
+   # Absolute path
+   PATH_TO_FILE="$RU_FILE"
+else
+   # Relative path
+   PATH_TO_FILE="$PWD/$RU_FILE"
+fi
 
-echo "Uploading '$RU_FILE' to '$RU_HOST/relution/api/v1/apps$curl_args' ..."
+filename=$(basename -- "$RU_FILE")
+
+echo "Uploading $filename to $RU_HOST/relution/api/v1/apps$curl_args ..."
 response=$(curl \
+  -sS \
   -H "Accept:application/json" \
   $curl_auth \
   $changelog \
-  -F "app=@$PWD/$RU_FILE" \
+  -F "app=@$PATH_TO_FILE" \
   "$RU_HOST/relution/api/v1/apps$curl_args")
-echo "$response" | "$JQ_EXECUTABLE" '.message'
+
+response_message=$(echo "$response" | "$JQ_EXECUTABLE" -r '.message')
 response_code=$(echo "$response" | "$JQ_EXECUTABLE" -r '.status')
+error_code=$(echo "$response" | "$JQ_EXECUTABLE" -r '.errorCode')
+
 if [[ "$response_code" == "0" ]]; then
+    echo $response_message
     appuuid=$(echo "$response" | "$JQ_EXECUTABLE" -r '.results[0].uuid')
     echo "$RU_HOST/relution/portal/#/apps/$appuuid/information"
+elif [[ "$error_code" == "VERSION_ALREADY_EXISTS" ]]; then
+    echo "Version already exists. Current version not uploaded again."
 else
-    echo "Upload failed!"
+    echo "There was an error uploading the App. This is the response we got:"
+    echo "$response" | "$JQ_EXECUTABLE"
     exit 1
 fi
