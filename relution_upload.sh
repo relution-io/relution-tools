@@ -64,10 +64,10 @@ if [ $RU_HELP ] ; then
     echo ""
     echo "-f --file               Path of the artifact that you want to deploy to the Relution Enterprise App Store, relative to the workspace directory. This is typically an Apple iOS (.ipa) or Google Android (.apk) binary."
     echo "-h --host               The Relution base url to which the file should be deployed."
-    echo "-r --release_status     The Release status in which the file should be put."
+    echo "-r --release_status     The Release status in which the file should be put. Valid arguments are release, review, development. Will set development by default."
     echo "-e --environment        The development hub environment id."
     echo "-a --api_key            Relution API Token used for the authentication."
-    echo "-n --archive            Wether to archive the previous App Version"
+    echo "-n --archive            Wether to archive the previous App Version. Default value is true: will always archive the former version."
 fi
 
 if [[ -n "$RU_RELEASE_STATUS" ]]; then
@@ -113,7 +113,7 @@ fi
 
 filename=$(basename -- "$RU_FILE")
 
-echo "Uploading $filename to $RU_HOST/relution/api/v1/apps$curl_args ..."
+echo "Uploading $filename to $RU_HOST/relution/api/v1/apps/fromFile$curl_args ..."
 response=$(curl \
   -sS \
   -H "Accept:application/json" \
