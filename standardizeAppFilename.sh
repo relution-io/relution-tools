@@ -49,7 +49,7 @@ if [[ $file == *.ipa ]]; then
 
   filename=${CFBundleIdentifier_now}_v${CFBundleVersion_now}_${timestamp}.ipa
 else
-  aaptPath=$(find $ANDROID_HOME/build-tools -name aapt -type f -print -quit)
+  aaptPath=$(find . $ANDROID_HOME/build-tools -name aapt -type f -print -quit)
 
   if [[ ! -f $aaptPath ]]; then
     echo "Error: Android Build Tools not installed."
@@ -70,11 +70,11 @@ else
     # unzip to become the universal.apk file
     unzip -q temp_${timestamp}.zip -d "${myTmpDir}" &> /dev/null
 
-    packageString=$(aapt dump badging universal.apk | grep package)
+    packageString=$($aaptPath dump badging universal.apk | grep package)
 
     cd - &> /dev/null
   else
-    packageString=$(aapt dump badging ${file} | grep package)
+    packageString=$($aaptPath dump badging ${file} | grep package)
   fi
 
   packageName=$(echo $packageString | awk '{print $2}' | sed s/name=//g | sed s/\'//g)
